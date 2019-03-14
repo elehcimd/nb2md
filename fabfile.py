@@ -149,7 +149,7 @@ def release():
     from secrets import pypi_auth
 
     # Check that all changes are committed before creating a new version
-    # git_check()
+    git_check()
 
     # Test package
     test()
@@ -158,7 +158,7 @@ def release():
     inc_version()
 
     # Commit new version, create tag for version and push everything to origin
-    # git_push()
+    git_push()
 
     # Build and publish package
     build()
