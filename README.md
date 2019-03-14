@@ -1,6 +1,6 @@
-# nb2md: covert Jupyter and Zeppelin notebooks to Markdown.
+# nb2md: conversion of Jupyter and Zeppelin notebooks to Jupyter or Markdown formats
 
-`nb2md` builds on top of [nbconvert](https://github.com/jupyter/nbconvert) and lets you convert both Jupyter and Zeppelin notebooks to Markdown.
+The `nb2md` tool builds on top of [nbconvert](https://github.com/jupyter/nbconvert) and lets you convert both Jupyter and Zeppelin notebooks to Markdown.
 
 ## Installation
 
