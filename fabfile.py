@@ -81,7 +81,7 @@ def git_push():
     """
 
     # get current version
-    new_version = version.__version__
+    new_version = get_version()
     values = list(map(lambda x: int(x), new_version.split('.')))
 
     # Push to origin new version and corresponding tag:
