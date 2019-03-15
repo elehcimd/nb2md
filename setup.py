@@ -15,7 +15,7 @@ setup(
     scripts=[],
     url='https://github.com/elehcimd/nb2md',
     license='MIT',
-    description='Covert Jupyter and Zeppelin notebooks to Markdown',
+    description='Conversion of Jupyter and Zeppelin notebooks to Jupyter or Markdown formats',
     long_description=long_description,
     python_requires=">=3.4",
     install_requires=[
