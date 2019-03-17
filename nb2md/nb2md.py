@@ -5,6 +5,7 @@ import urllib
 
 import boto3
 import nbformat as nbf
+import urllib.request
 from fabric.api import local
 
 from nb2md.version import __version__
@@ -20,13 +21,13 @@ def fatal(msg):
     sys.exit(0)
 
 
-def read_s3(s3uri):
+def read_s3(uri):
     """
     Read notebook from S3
     :param s3uri: S3 URI
     :return: contents of file
     """
-    parts = urllib.parse.urlsplit(s3uri)
+    parts = urllib.parse.urlsplit(uri)
     bucket = parts.netloc
     key = parts.path[1:]
 
@@ -36,6 +37,16 @@ def read_s3(s3uri):
     obj = s3.Object(bucket, key)
 
     return obj.get()['Body'].read().decode('utf-8')
+
+
+def read_http(uri):
+    """
+    Read notebook from HTTP URI
+    :param uri: HTTP URI, e.g., "http://...."
+    :return:
+    """
+
+    return urllib.request.urlopen(uri).read()
 
 
 class Notebook:
@@ -53,6 +64,8 @@ class Notebook:
         """
         if pathname.startswith("s3://"):
             return read_s3(pathname)
+        elif pathname.startswith("http://") or pathname.startswith("https://"):
+            return read_http(pathname)
         else:
             return open(pathname, "r").read().encode("utf-8")
 
