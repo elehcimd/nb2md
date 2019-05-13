@@ -19,6 +19,7 @@ setup(
     long_description=long_description,
     python_requires=">=3.4",
     install_requires=[
+        "Fabric3",
         "nbformat",
         "boto3"
     ],

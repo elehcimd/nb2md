@@ -58,10 +58,10 @@ The pynb project is released under the MIT license. Please see [LICENSE.txt](htt
 ## Development
 
 Tests, builds and releases are managed with `Fabric`.
-Install Fabric in your system. To install Fabric:
+You also need the `wheel` package. To install them:
 
 ```
-pip install Fabric3
+pip install wheel Fabric3
 ```
 
 ### Building and publishing a new release

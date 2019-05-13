@@ -8,7 +8,11 @@ import nbformat as nbf
 import urllib.request
 from fabric.api import local
 
-from nb2md.version import __version__
+
+try:
+    from nb2md.version import __version__
+except ImportError:
+    from version import __version__
 
 
 def fatal(msg):
@@ -140,7 +144,7 @@ class Notebook:
                 cell = nbf.v4.new_markdown_cell(source[3:].strip())
                 self.nb['cells'].append(cell)
 
-            elif not source.startswith("%"):
+            elif not source.startswith("%") or source.startswith("%sh") or source.startswith("%spark.dep"):
                 count_cells_code += 1
                 execution_count += 1
                 outputs = []
