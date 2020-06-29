@@ -156,7 +156,11 @@ class Notebook:
                 cell = nbf.v4.new_markdown_cell(source[3:].strip())
                 self.nb['cells'].append(cell)
 
-            elif not source.startswith("%") or source.startswith("%sh") or source.startswith("%spark.dep"):
+            elif not source.startswith("%") or \
+                    source.startswith("%sh") or \
+                    source.startswith("%spark.dep") or \
+                    source.startswith("%pyspark") or \
+                    source.startswith("%spark"):
                 count_cells_code += 1
                 execution_count += 1
                 outputs = []
