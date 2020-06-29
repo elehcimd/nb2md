@@ -1,0 +1,4 @@
+fabric==2.5.0
+autopep8==1.5.3
+pytest==5.4.3
+wheel

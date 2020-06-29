@@ -2,13 +2,15 @@ import importlib
 import os
 import sys
 
-from fabric.api import local
-from fabric.decorators import task
-
-# make sure that we import the awsflow package from this directory
-sys.path = ["."] + sys.path
+from fabric import task
 
 import version
+
+# this must be before importing from secrets.
+sys.path = ["."] + sys.path
+
+from secrets import pypi_auth
+
 
 # Initialise project directory and name
 project_dir = os.path.abspath(os.path.dirname(__file__))
@@ -18,160 +20,184 @@ project_name = os.path.basename(project_dir)
 os.chdir(project_dir)
 
 
-def fatal(msg):
-    print("Fatal error: {}; exiting.".format(msg))
-    sys.exit(1)
-
-
-def get_version():
-    return sys.modules[project_name].version.__version__
+def local(ctx, *args, **kwargs):
+    s = "Executing: {} {}".format(args, kwargs)
+    if len(s) > 70:
+        s = s[:70] + f".. ({len(s[70:])})"
+    print(s)
+    return ctx.run(*args, **kwargs)
 
 
 @task
+def test_pep8(ctx):
+    """
+    Run only pep8 test
+    :return:
+    """
+
+    local(ctx, 'py.test tests/test_pep8.py')
+
+
+@task
+def test(ctx):
+    """
+    Run all tests
+    :param params: parameters to py.test
+    :return:
+    """
+
+    local(ctx, f'py.test tests')
+
+
+@task
+def test_sx(ctx):
+    """
+    Run all tests
+    :param params: parameters to py.test
+    :return:
+    """
+
+    local(ctx, f'py.test -sx tests')
+
+
+@task
+def test_single(ctx, f):
+    """
+    Run all tests
+    :param params: parameters to py.test
+    :return:
+    """
+
+    local(ctx, f'py.test -sx {f}')
+
+
+@task
+def fix_pep8(ctx):
+    """
+    Fix a few common and easy-to-fix PEP8 mistakes
+    :return:
+    """
+
+    local(ctx,
+          'autopep8 --select E265,E225,E302,E222,E251,E303,W293,W291,W391 --aggressive --in-place --recursive .')
+
+
 def inc_version():
     """
     Increment micro release version (in 'major.minor.micro') in version.py and re-import it.
-    Major and minor versions must be incremented manually in  version.py.
+    Major and minor versions must be incremented manually in version.py.
+
+    :return: list with current version numbers, e.g., [0,1,23].
     """
 
-    importlib.import_module(project_name + ".version")
+    new_version = version.__version__
 
-    current_version = get_version()
-
-    values = list(map(lambda x: int(x), current_version.split('.')))
+    values = list(map(lambda x: int(x), new_version.split('.')))
     values[2] += 1
 
-    new_version = '{}.{}.{}'.format(values[0], values[1], values[2])
+    with open("version.py", "w") as f:
+        f.write(f'__version__ = "{values[0]}.{values[1]}.{values[2]}"\n')
+        f.write(f'__pkgname__ = "{project_name}"\n')
+    with open(f"{project_name}/version.py", "w") as f:
+        f.write(f'__version__ = "{values[0]}.{values[1]}.{values[2]}"\n')
+        f.write(f'__pkgname__ = "{project_name}"\n')
 
-    with open('version.py', 'w') as f:
-        f.write('__version__ = "{}"\n'.format(new_version))
-    with open('{project_name}/version.py'.format(project_name=project_name), 'w') as f:
-        f.write('__version__ = "{}"\n'.format(new_version))
+    importlib.reload(version)
 
-    sys.modules[project_name].version.__version__ = new_version
+    print(f'Package {version.__pkgname__} current version: {version.__version__}')
 
-    print('Increased minor version: {} => {}'.format(current_version, new_version))
+    return values
 
 
 @task
-def git_check():
+def git_check(ctx):
     """
     Check that all changes , besides versioning files, are committed
     :return:
     """
 
     # check that changes staged for commit are pushed to origin
-    output = local(
-        'git diff --name-only | egrep -v "^({}/version.py)|(version.py)$" | tr "\\n" " "'.format(project_name),
-        capture=True).strip()
+    output = local(ctx, f'git diff --name-only | egrep -v "^({project_name}/version.py)|(version.py)$" | tr "\\n" " "',
+                   hide=True).stdout.strip()
+
     if output:
         fatal('Stage for commit and commit all changes first: {}'.format(output))
 
-    output = local(
-        'git diff --cached --name-only | egrep -v "^({}/version.py)|(version.py)$" | tr "\\n" " "'.format(project_name),
-        capture=True).strip()
+    output = local(ctx,
+                   f'git diff --cached --name-only | egrep -v "^({project_name}/version.py)|(version.py)$" | tr "\\n" " "',
+                   hide=True).stdout.strip()
     if output:
         fatal('Commit all changes first: {}'.format(output))
 
 
-def git_push():
+def fatal(msg):
+    print("Fatal error: {}; exiting.".format(msg))
+    sys.exit(1)
+
+
+def git_push(ctx):
     """
     Push new version and corresponding tag to origin
     :return:
     """
 
     # get current version
-    new_version = get_version()
+    new_version = version.__version__
     values = list(map(lambda x: int(x), new_version.split('.')))
 
     # Push to origin new version and corresponding tag:
     # * commit new version
     # * create tag
     # * push version,tag to origin
-    local('git add {}/version.py version.py'.format(project_name))
+    local(ctx, f'git add {project_name}/version.py version.py')
 
-    local('git commit -m "updated version"')
-    local('git tag {}.{}.{}'.format(values[0], values[1], values[2]))
-    local('git push origin --tags')
-    local('git push')
-
-
-@task
-def test(params=''):
-    """
-    Run all tests in docker container
-    :param params: parameters to py.test
-    """
-    local('py.test {}'.format(params))
+    local(ctx, 'git commit -m "updated version"')
+    local(ctx, f'git tag {values[0]}.{values[1]}.{values[2]}')
+    local(ctx, 'git push origin --tags')
+    local(ctx, 'git push')
 
 
 @task
-def test_sx(params=''):
-    """
-    Execute all tests in docker container printing output and terminating tests at first failure
-    :param params: parameters to py.test
-    """
-    local('py.test -sx {}'.format(params))
-
-
-@task
-def test_pep8():
-    """
-    Execute  only pep8 test in docker container
-    """
-    local('py.test tests/test_pep8.py')
-
-
-@task
-def fix_pep8():
-    """
-    Fix a few common and easy PEP8 mistakes in docker container
-    """
-    local('autopep8 --select E251,E303,W293,W291,W391,W292,W391,E302 --aggressive --in-place --recursive .')
-
-
-@task
-def build():
-    """
-    Build package in docker container
-    :return:
-    """
-    local('python3 setup.py sdist bdist_wheel')
-
-
-@task
-def release():
+def release(ctx):
     """
     Release new package version to pypi
     :return:
     """
 
-    from secrets import pypi_auth
-
     # Check that all changes are committed before creating a new version
-    git_check()
+    git_check(ctx)
 
     # Test package
-    test()
+    test(ctx)
 
     # Increment version
     inc_version()
 
     # Commit new version, create tag for version and push everything to origin
-    git_push()
+    git_push(ctx)
 
     # Build and publish package
-    build()
-    pathname = 'dist/{}-{}.tar.gz'.format(project_name, get_version())
-    local('twine upload -u {user} -p {pass} {pathname}'.format(pathname=pathname, **pypi_auth))
+    pkgbuild(ctx)
+    pathname = f'dist/{project_name}-{version.__version__}.tar.gz'
+
+    local(f'twine upload -u {pypi_auth["user"]} -p {pypi_auth["pass"]} {pathname}')
 
     # Remove temporary files
-    clean()
+    clean(ctx)
 
 
 @task
-def clean():
+def pkgbuild(ctx):
+    """
+    Build package in docker container
+    :return:
+    """
+    local(ctx, 'python setup.py sdist bdist_wheel')
+
+
+@task
+def clean(ctx):
     """
     Rempove temporary files
     """
-    local('rm -rf .cache .eggs .pytest_cache build dist')
+    local(ctx, 'rm -rf .cache .eggs build dist')

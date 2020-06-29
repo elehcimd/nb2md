@@ -1,18 +1,30 @@
 import argparse
 import json
+import subprocess
 import sys
 import urllib
+import urllib.request
 
 import boto3
 import nbformat as nbf
-import urllib.request
-from fabric.api import local
-
 
 try:
     from nb2md.version import __version__
 except ImportError:
     from version import __version__
+
+
+def local(args):
+    if type(args) == list:
+        cmd = ' '.join(args)
+    else:
+        cmd = args
+
+    try:
+        out = subprocess.check_output(cmd, shell=True)
+    except subprocess.CalledProcessError as grepexc:
+        fatal("Error ({}): {}".format(grepexc.returncode, grepexc.output))
+    print(out)
 
 
 def fatal(msg):

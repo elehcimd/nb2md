@@ -3,23 +3,22 @@ from setuptools import setup
 from version import __version__
 
 # Get the long description from the README file
-with open('README.rst', encoding='utf-8') as f:
+with open('README.rst') as f:
     long_description = f.read()
 
 setup(
     name='nb2md',
     version=__version__,
     author='Michele Dallachiesa',
-    author_email='michele.dallachiesa@minodes.com',
+    author_email='michele.dallachiesa@sigforge.com',
     packages=['nb2md'],
     scripts=[],
     url='https://github.com/elehcimd/nb2md',
     license='MIT',
-    description='Conversion of Jupyter and Zeppelin notebooks to Jupyter or Markdown formats',
+    description='Conversion of Jupyter and Zeppelin notebooks to Jupyter and Markdown formats',
     long_description=long_description,
     python_requires=">=3.4",
     install_requires=[
-        "Fabric3",
         "nbformat",
         "boto3"
     ],
@@ -28,7 +27,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',

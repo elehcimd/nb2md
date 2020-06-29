@@ -57,11 +57,51 @@ The pynb project is released under the MIT license. Please see [LICENSE.txt](htt
 
 ## Development
 
-Tests, builds and releases are managed with `Fabric`.
-You also need the `wheel` package. To install them:
+### Create Python environment
+
+Create a Python virtual environment with the packages in `requirements.txt`.
+Instructions for MacOS:
+
+* Install a specific version of Python: `pyenv install 3.8.3`
+* Create virtualenv: `pyenv virtualenv 3.8.3 nb2md`
+* Activate virtualenv: `pyenv activate nb2md`
+* Update pip: `pip install --upgrade pip`
+* Install packages: `pip install -r requirements.txt`
+* Remove virtualenv: `pyenv virtualenv-delete nb2md`
+
+Once the environment is ready, activate it.
+
+In case you need to install `pyenv` with zsh, these are the steps for MacOS:
+
+First:
 
 ```
-pip install wheel Fabric3
+brew update
+brew install pyenv
+brew install pyenv-virtualenv
+```
+
+Second, add to `~.zshrc`:
+
+```
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+  export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+fi
+
+if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
+```
+
+To install the required packages:
+
+```
+pip install -r requirements.txt
+```
+
+Install package in development mode:
+
+```
+pip install -e .
 ```
 
 ### Building and publishing a new release
