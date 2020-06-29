@@ -1,13 +1,13 @@
 # nb2md: conversion of Jupyter and Zeppelin notebooks to Jupyter or Markdown formats
 
-The `nb2md` tool builds on top of [nbconvert](https://github.com/jupyter/nbconvert) and lets you convert both Jupyter and Zeppelin notebooks to Markdown.
+`nb2md` relies on [nbconvert](https://github.com/jupyter/nbconvert) and lets you convert Jupyter and Zeppelin notebooks to Jupyter or Markdown formats.
 
 ## Installation
 
-You can install the package with pip:
+You can install or update the package with pip:
 
 ```
-pip install nb2md
+pip install -U nb2md
 ```
 
 ## Usage
@@ -33,7 +33,6 @@ To convert a Zeppelin notebook hosted on AWS S3:
 nb2md --src s3://bucketname/your/path/2E6XDUATX/note.json
 ```
 
-
 To convert a Jupyter notebook to Markdown:
 
 ```
@@ -46,14 +45,9 @@ To convert a Zeppelin notebook to the Jupyter format:
 nb2md --src notebooks/example1.json --dst example1.ipynb
 ```
 
-
-
 ## Credits and license
 
-[Minodes](http://www.minodes.com) supports this and other Open Source projects.
-
 The pynb project is released under the MIT license. Please see [LICENSE.txt](https://github.com/elehcimd/nb2md/blob/master/LICENSE.txt).
-
 
 ## Development
 
@@ -67,9 +61,8 @@ Instructions for MacOS:
 * Activate virtualenv: `pyenv activate nb2md`
 * Update pip: `pip install --upgrade pip`
 * Install packages: `pip install -r requirements.txt`
+* Install package in development mode: `nb2md`
 * Remove virtualenv: `pyenv virtualenv-delete nb2md`
-
-Once the environment is ready, activate it.
 
 In case you need to install `pyenv` with zsh, these are the steps for MacOS:
 
@@ -92,17 +85,6 @@ fi
 if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
 ```
 
-To install the required packages:
-
-```
-pip install -r requirements.txt
-```
-
-Install package in development mode:
-
-```
-pip install -e .
-```
 
 ### Building and publishing a new release
 
@@ -121,39 +103,12 @@ To release a new version:
 fab release
 ```
 
-
 ### Running the tests
 
-To run the py.test tests:
-
-```
-fab test
-```
-
-To run a single test:
-
-```
-fab test:tests/test_pep8.py::test_pep8
-```
-
-To run tests printing output and stopping at first error:
-
-```
-fab test_sx
-```
-
-To run the pep8 test:
-
-```
-fab test_pep8
-```
-
-To fix some common pep8 errors in the code:
-
-```
-fab fix_pep8
-```
-
+* To run the py.test tests: `fab test`
+* To run tests printing output and stopping at first error: `fab test-sx`
+* To run the pep8 test: `fab test-pep8`
+* To fix some common pep8 errors in the code: `fab fix-pep8`
 
 ## Contributing
 
