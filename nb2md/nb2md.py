@@ -160,7 +160,8 @@ class Notebook:
                     source.startswith("%sh") or \
                     source.startswith("%spark.dep") or \
                     source.startswith("%pyspark") or \
-                    source.startswith("%spark"):
+                    source.startswith("%spark") or \
+                    source.startswith("%sql"):
                 count_cells_code += 1
                 execution_count += 1
                 outputs = []
