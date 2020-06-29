@@ -53,20 +53,17 @@ The pynb project is released under the MIT license. Please see [LICENSE.txt](htt
 
 ### Create Python environment
 
-Create a Python virtual environment with the packages in `requirements.txt`.
-Instructions for MacOS:
+Instructions that work on MacOS Catalina:
 
 * Install a specific version of Python: `pyenv install 3.8.3`
 * Create virtualenv: `pyenv virtualenv 3.8.3 nb2md`
 * Activate virtualenv: `pyenv activate nb2md`
 * Update pip: `pip install --upgrade pip`
 * Install packages: `pip install -r requirements.txt`
-* Install package in development mode: `nb2md`
+* Install package in development mode: `pip install -e .`
 * Remove virtualenv: `pyenv virtualenv-delete nb2md`
 
-In case you need to install `pyenv` with zsh, these are the steps for MacOS:
-
-First:
+Install pyenv/virtualenv:
 
 ```
 brew update
@@ -74,7 +71,7 @@ brew install pyenv
 brew install pyenv-virtualenv
 ```
 
-Second, add to `~.zshrc`:
+Add to `~.zshrc`:
 
 ```
 if command -v pyenv 1>/dev/null 2>&1; then
@@ -85,6 +82,7 @@ fi
 if which pyenv-virtualenv-init > /dev/null; then eval "$(pyenv virtualenv-init -)"; fi
 ```
 
+The fabfile assumes you have `zsh` as shell and the `pynb` virtual env. 
 
 ### Building and publishing a new release
 

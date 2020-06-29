@@ -11,7 +11,6 @@ sys.path = ["."] + sys.path
 
 from secrets import pypi_auth
 
-
 # Initialise project directory and name
 project_dir = os.path.abspath(os.path.dirname(__file__))
 project_name = os.path.basename(project_dir)
@@ -20,14 +19,22 @@ project_name = os.path.basename(project_dir)
 os.chdir(project_dir)
 
 
+@task
+def fuck(ctx):
+    local(ctx, "./runme.sh")
+
+
 def local(ctx, *args, **kwargs):
     s = "Executing: {} {}".format(args, kwargs)
     if len(s) > 70:
         s = s[:70] + f".. ({len(s[70:])})"
     print(s)
 
+    # http://docs.pyinvoke.org/en/stable/api/runners.html#invoke.runners.Runner.run
     with ctx.prefix("PATH={}".format(os.environ["PATH"])):
-        return ctx.run(*args, **kwargs)
+        with ctx.prefix("source ~/.zshrc"):
+            with ctx.prefix("pyenv activate nb2md"):
+                return ctx.run(*args, **kwargs, pty=True, shell="/bin/zsh")
 
 
 @task
@@ -48,7 +55,7 @@ def test(ctx):
     :return:
     """
 
-    local(ctx, f'py.test tests')
+    local(ctx, f'pytest')
 
 
 @task
@@ -180,12 +187,16 @@ def release(ctx):
 
     # Build and publish package
     pkgbuild(ctx)
-    pathname = f'dist/{project_name}-{version.__version__}.tar.gz'
-
-    local(ctx, f'twine upload -u {pypi_auth["user"]} -p {pypi_auth["pass"]} {pathname}')
+    pkgupload(ctx)
 
     # Remove temporary files
     clean(ctx)
+
+
+@task
+def pkgupload(ctx):
+    pathname = f'dist/{project_name}-{version.__version__}.tar.gz'
+    local(ctx, 'twine upload -u "{}" -p "{}" "{}"'.format(pypi_auth["user"], pypi_auth["pass"], pathname))
 
 
 @task
