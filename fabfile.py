@@ -182,7 +182,7 @@ def release(ctx):
     pkgbuild(ctx)
     pathname = f'dist/{project_name}-{version.__version__}.tar.gz'
 
-    local(f'twine upload -u {pypi_auth["user"]} -p {pypi_auth["pass"]} {pathname}')
+    local(ctx, f'twine upload -u {pypi_auth["user"]} -p {pypi_auth["pass"]} {pathname}')
 
     # Remove temporary files
     clean(ctx)
