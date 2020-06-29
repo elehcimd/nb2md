@@ -25,7 +25,9 @@ def local(ctx, *args, **kwargs):
     if len(s) > 70:
         s = s[:70] + f".. ({len(s[70:])})"
     print(s)
-    return ctx.run(*args, **kwargs)
+
+    with ctx.prefix("PATH={}".format(os.environ["PATH"])):
+        return ctx.run(*args, **kwargs)
 
 
 @task
